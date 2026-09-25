@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RepTrack — Latihan terhitung, gerakan terkoreksi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1420;
+    --panel:#121F2E;
+    --panel-2:#182B3D;
+    --ink:#F2EFE6;
+    --ink-dim:#A9B6C2;
+    --line:rgba(242,239,230,0.12);
+    --red:#FF4B2B;
+    --yellow:#FFD23F;
+    --teal:#2EC4B6;
+    --font-display:'Oswald', 'Arial Narrow', sans-serif;
+    --font-body:'Inter', -apple-system, sans-serif;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px); scroll-behavior:smooth;}
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#F4F1E6; --panel:#FFFFFF; --panel-2:#ECE7D8; --ink:#101A24; --ink-dim:#57626C; --line:rgba(16,26,36,0.12);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#F4F1E6; --panel:#FFFFFF; --panel-2:#ECE7D8; --ink:#101A24; --ink-dim:#57626C; --line:rgba(16,26,36,0.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--font-body);
+    line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  img,svg{max-width:100%;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;}
+  a{color:inherit;}
+  .tab{font-variant-numeric:tabular-nums;}
+
+  /* ---------- NAV ---------- */
+  header{
+    position:sticky; top:env(safe-area-inset-top,0px); z-index:50;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+  }
+  nav.wrap{display:flex; align-items:center; justify-content:space-between; height:72px;}
+  .logo{font-family:var(--font-display); font-weight:600; font-size:1.4rem; letter-spacing:.02em; display:flex; align-items:center; gap:8px;}
+  .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--red);display:inline-block;}
+  .navlinks{display:flex; gap:34px; font-size:.94rem; color:var(--ink-dim);}
+  .navlinks a{text-decoration:none; transition:color .15s;}
+  .navlinks a:hover{color:var(--ink);}
+  .cta{
+    background:var(--red); color:#0B1420; font-weight:600; font-size:.92rem;
+    padding:11px 22px; border-radius:7px; text-decoration:none; border:none; cursor:pointer;
+    font-family:var(--font-body); transition:transform .15s, box-shadow .15s;
+  }
+  .cta:hover{transform:translateY(-1px); box-shadow:0 6px 18px rgba(255,75,43,.35);}
+  .navmobile{display:none;}
+  @media (max-width:760px){ .navlinks{display:none;} }
+
+  /* ---------- HERO ---------- */
+  .hero{padding:76px 0 60px; border-bottom:1px solid var(--line);}
+  .hero-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:56px; align-items:center;}
+  @media (max-width:900px){ .hero-grid{grid-template-columns:1fr;} }
+  .kicker{color:var(--teal); font-weight:600; font-size:.85rem; letter-spacing:.03em; margin-bottom:18px;}
+  h1{
+    font-family:var(--font-display); font-weight:600; font-size:clamp(2.5rem,5.2vw,3.9rem);
+    line-height:1.04; letter-spacing:-.01em; max-width:12ch;
+  }
+  h1 em{font-style:normal; color:var(--red);}
+  .hero p.lead{margin-top:22px; font-size:1.13rem; color:var(--ink-dim); max-width:46ch;}
+  .hero-actions{display:flex; gap:14px; margin-top:32px; flex-wrap:wrap;}
+  .btn-ghost{
+    padding:11px 22px; border-radius:7px; border:1px solid var(--line); text-decoration:none;
+    font-size:.92rem; font-weight:600; color:var(--ink);
+  }
+  .hero-stats{display:flex; gap:36px; margin-top:44px; padding-top:28px; border-top:1px solid var(--line);}
+  .hero-stats div b{display:block; font-family:var(--font-display); font-size:1.7rem;}
+  .hero-stats div span{font-size:.82rem; color:var(--ink-dim);}
+
+  /* ---------- DEMO WIDGET (used in hero + section) ---------- */
+  .demo-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px;
+    position:relative; overflow:hidden;
+  }
+  .demo-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+  .demo-top .label{font-size:.8rem; color:var(--ink-dim); display:flex; align-items:center; gap:8px;}
+  .rec{width:8px;height:8px;border-radius:50%; background:var(--red); animation:pulse 1.4s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+  .cam{
+    background:#060C13; border-radius:11px; aspect-ratio:4/3; position:relative;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+    border:1px solid var(--line);
+  }
+  :root[data-theme="light"] .cam{ background:#0E1B26; }
+  .cam svg{width:58%; }
+  .rep-count{
+    position:absolute; top:12px; right:14px; font-family:var(--font-display);
+    font-size:2.1rem; color:var(--yellow); text-shadow:0 0 18px rgba(255,210,63,.5);
+  }
+  .rep-count span{font-size:.85rem; display:block; color:var(--ink-dim); font-family:var(--font-body); margin-top:-4px;}
+  .feedback-chip{
+    position:absolute; bottom:14px; left:14px; background:rgba(46,196,182,.16); color:var(--teal);
+    border:1px solid rgba(46,196,182,.4); font-size:.8rem; padding:6px 12px; border-radius:20px;
+    opacity:0; transform:translateY(6px); transition:opacity .25s, transform .25s; font-weight:600;
+  }
+  .feedback-chip.show{opacity:1; transform:translateY(0);}
+  .feedback-chip.warn{background:rgba(255,75,43,.14); color:#FF8F73; border-color:rgba(255,75,43,.4);}
+  .demo-controls{display:flex; gap:10px; margin-top:16px;}
+  .demo-btn{
+    flex:1; background:var(--panel-2); border:1px solid var(--line); color:var(--ink);
+    padding:11px; border-radius:8px; font-family:var(--font-body); font-weight:600; font-size:.88rem; cursor:pointer;
+  }
+  .demo-btn.primary{background:var(--red); color:#0B1420; border-color:transparent;}
+
+  /* live camera */
+  .camvideo{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+    transform:scaleX(-1); display:none; background:#000;
+  }
+  .camvideo.show{display:block;}
+  .cam-placeholder{
+    display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center;
+    padding:0 24px; color:var(--ink-dim);
+  }
+  .cam-placeholder.hide{display:none;}
+  .cam-placeholder svg{width:34px; height:34px; opacity:.7;}
+  .cam-placeholder p{font-size:.85rem; max-width:22ch;}
+  .cam-placeholder.error p{color:#FF8F73;}
+
+  /* ---------- SECTION SHARED ---------- */
+  section{padding:84px 0;}
+  section.alt{background:var(--panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .sec-head{max-width:640px; margin-bottom:52px;}
+  .sec-head .kicker{margin-bottom:14px;}
+  h2{font-family:var(--font-display); font-weight:600; font-size:clamp(1.9rem,3.4vw,2.6rem); letter-spacing:-.005em;}
+  .sec-head p{color:var(--ink-dim); margin-top:14px; font-size:1.04rem;}
+
+  /* problems */
+  .problems{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden;}
+  @media (max-width:800px){ .problems{grid-template-columns:1fr;} }
+  .problem{background:var(--bg); padding:32px 28px;}
+  .problem .n{font-family:var(--font-display); font-size:1rem; color:var(--red); margin-bottom:14px;}
+  .problem h3{font-size:1.1rem; font-weight:600; margin-bottom:10px;}
+  .problem p{color:var(--ink-dim); font-size:.94rem;}
+
+  /* features */
+  .features{display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
+  @media (max-width:800px){ .features{grid-template-columns:1fr;} }
+  .feature{padding:30px 26px; border:1px solid var(--line); border-radius:14px; background:var(--bg);}
+  section.alt .feature{background:var(--panel);}
+  .feature .icon{width:42px;height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;}
+  .feature h3{font-size:1.12rem; font-weight:600; margin-bottom:10px; font-family:var(--font-display);}
+  .feature p{color:var(--ink-dim); font-size:.94rem;}
+
+  /* integrations */
+  .badges{display:flex; flex-wrap:wrap; gap:12px; margin-top:8px;}
+  .badge{border:1px solid var(--line); padding:10px 18px; border-radius:8px; font-size:.9rem; color:var(--ink-dim); font-weight:500;}
+  .badge b{color:var(--ink); font-weight:600;}
+
+  /* pricing */
+  .pricing{display:grid; grid-template-columns:1fr 1fr; gap:24px;}
+  @media (max-width:760px){ .pricing{grid-template-columns:1fr;} }
+  .price-card{border:1px solid var(--line); border-radius:16px; padding:34px; background:var(--bg);}
+  .price-card.pro{border-color:var(--red); position:relative; background:linear-gradient(160deg, rgba(255,75,43,.07), transparent 60%);}
+  .price-tag{font-family:var(--font-display); font-size:2.4rem; margin:14px 0 4px;}
+  .price-tag span{font-size:1rem; color:var(--ink-dim); font-family:var(--font-body);}
+  .price-card ul{list-style:none; margin-top:22px; display:flex; flex-direction:column; gap:12px;}
+  .price-card li{font-size:.93rem; color:var(--ink-dim); display:flex; gap:10px; align-items:flex-start;}
+  .price-card li:before{content:"✓"; color:var(--teal); font-weight:700; flex-shrink:0;}
+  .price-card .cta, .price-card .btn-ghost{display:block; text-align:center; margin-top:26px; width:100%;}
+
+  /* CTA band */
+  .ctaband{
+    background:var(--panel-2); border-radius:18px; padding:60px 48px; text-align:center; margin:0 28px;
+    border:1px solid var(--line);
+  }
+  .ctaband h2{max-width:20ch; margin:0 auto;}
+  .ctaband p{color:var(--ink-dim); margin:16px auto 30px; max-width:44ch;}
+
+  footer{padding:44px 0 32px; border-top:1px solid var(--line);}
+  .foot-grid{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:24px;}
+  .foot-grid .logo{margin-bottom:10px;}
+  footer .credit{color:var(--ink-dim); font-size:.82rem; line-height:1.7;}
+  footer .fine{margin-top:28px; color:var(--ink-dim); font-size:.78rem; border-top:1px solid var(--line); padding-top:20px;}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <div class="logo"><span class="dot"></span>RepTrack</div>
+    <div class="navlinks">
+      <a href="#masalah">Masalah</a>
+      <a href="#cara-kerja">Cara kerja</a>
+      <a href="#demo">Coba demo</a>
+      <a href="#harga">Harga</a>
+    </div>
+    <a class="cta" href="#demo">Coba gratis</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="kicker">PLATFORM LATIHAN MANDIRI BERBASIS AI</div>
+      <h1>Gerakanmu dihitung, dikoreksi, <em>tanpa install apa pun</em>.</h1>
+      <p class="lead">RepTrack membaca gerakan lewat kamera browser, menghitung repetisi secara otomatis, dan mengoreksi posisimu secara real-time — langsung dari website, tanpa unduh aplikasi atau bayar di muka.</p>
+      <div class="hero-actions">
+        <a class="cta" href="#demo">Coba gratis sekarang</a>
+        <a class="btn-ghost" href="#cara-kerja">Lihat cara kerjanya</a>
+      </div>
+      <div class="hero-stats">
+        <div><b class="tab">Rp 0</b><span>Modal server awal</span></div>
+        <div><b class="tab">100%</b><span>Jalan di browser (PWA)</span></div>
+        <div><b class="tab">1-on-1</b><span>Koreksi gerakan real-time</span></div>
+      </div>
+    </div>
+
+    <div class="demo-card">
+      <div class="demo-top">
+        <div class="label"><span class="rec"></span>Live tracking</div>
+        <div class="label">Push-up</div>
+      </div>
+      <div class="cam">
+        <video id="camA" class="camvideo" autoplay playsinline muted></video>
+        <div class="cam-placeholder" id="placeholderA">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 012-2h2l1.4-2h5.2L16 6h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V8z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/></svg>
+          <p>Klik "Mulai latihan" dan izinkan akses kamera</p>
+        </div>
+        <div class="rep-count tab" id="repNum">0<span>REPETISI</span></div>
+        <div class="feedback-chip" id="chipA">Bentuk sempurna</div>
+      </div>
+      <div class="demo-controls">
+        <button class="demo-btn primary" id="startA">Mulai latihan</button>
+        <button class="demo-btn" id="resetA">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="masalah">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">MASALAH YANG KAMI LIHAT</div>
+      <h2>Latihan mandiri di rumah sering berhenti di niat</h2>
+      <p>Tiga hambatan utama yang bikin orang urung rutin latihan sendiri — dan mengapa aplikasi biasa belum menjawabnya.</p>
+    </div>
+    <div class="problems">
+      <div class="problem">
+        <div class="n">Akses</div>
+        <h3>Enggan instal aplikasi</h3>
+        <p>Aplikasi fitness umumnya besar, makan kuota, dan butuh proses instalasi — orang keburu malas sebelum sempat coba.</p>
+      </div>
+      <div class="problem">
+        <div class="n">Privasi</div>
+        <h3>Video pribadi jadi rawan</h3>
+        <p>Rekaman latihan sering tersimpan atau terkirim ke server pihak lain tanpa kejelasan soal keamanan datanya.</p>
+      </div>
+      <div class="problem">
+        <div class="n">Akurasi</div>
+        <h3>Latihan sendiri, salah sendiri</h3>
+        <p>Tanpa pengawasan, kesalahan postur tidak ketahuan — risiko cedera naik, progres latihan pun sulit diukur.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="cara-kerja">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">CARA REPTRACK MENJAWAB INI</div>
+      <h2>Satu platform web, tiga solusi sekaligus</h2>
+    </div>
+    <div class="features">
+      <div class="feature">
+        <div class="icon" style="background:rgba(255,75,43,.14);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" stroke="var(--red)" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Koreksi gerakan real-time</h3>
+        <p>Model machine learning membaca titik gerak tubuh langsung dari kamera dan memvalidasi tiap repetisi saat itu juga — bukan setelah selesai latihan.</p>
+      </div>
+      <div class="feature">
+        <div class="icon" style="background:rgba(46,196,182,.14);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19V5a1 1 0 011-1h10l5 5v10a1 1 0 01-1 1H5a1 1 0 01-1-1z" stroke="var(--teal)" stroke-width="2"/><path d="M9 21v-6h6v6" stroke="var(--teal)" stroke-width="2"/></svg>
+        </div>
+        <h3>Infrastruktur murah & scalable</h3>
+        <p>Dibangun di atas layanan cloud dengan tingkat gratis — biaya operasional tetap nol sampai kamu siap tumbuh lebih besar.</p>
+      </div>
+      <div class="feature">
+        <div class="icon" style="background:rgba(255,210,63,.16);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="2" width="16" height="20" rx="2" stroke="var(--yellow)" stroke-width="2"/><path d="M9 18h6" stroke="var(--yellow)" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Tanpa hambatan akses</h3>
+        <p>Berjalan sebagai Progressive Web App langsung dari browser — buka tautan, izinkan kamera, latihan dimulai.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:44px;">
+      <div class="badges">
+        <span class="badge">Terintegrasi <b>Strava</b> untuk data lari & kekuatan</span>
+        <span class="badge">Dibangun dengan <b>Next.js</b> + <b>TensorFlow</b></span>
+        <span class="badge">Ditenagai <b>Supabase</b> & <b>Vercel</b></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap" style="max-width:760px;">
+    <div class="sec-head" style="margin:0 auto 40px; text-align:center;">
+      <div class="kicker" style="margin:0 auto 14px;">COBA SEKARANG</div>
+      <h2>Rasakan koreksi real-time-nya</h2>
+      <p style="margin:14px auto 0;">Ini simulasi ringan dari cara RepTrack menghitung dan mengoreksi repetisimu. Versi penuh membaca gerakan asli lewat kamera.</p>
+    </div>
+    <div class="demo-card" style="max-width:420px; margin:0 auto;">
+      <div class="demo-top">
+        <div class="label"><span class="rec"></span>Live tracking</div>
+        <div class="label">Squat</div>
+      </div>
+      <div class="cam">
+        <video id="camB" class="camvideo" autoplay playsinline muted></video>
+        <div class="cam-placeholder" id="placeholderB">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 012-2h2l1.4-2h5.2L16 6h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V8z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/></svg>
+          <p>Klik "Mulai latihan" dan izinkan akses kamera</p>
+        </div>
+        <div class="rep-count tab" id="repNumB">0<span>REPETISI</span></div>
+        <div class="feedback-chip" id="chipB">Bentuk sempurna</div>
+      </div>
+      <div class="demo-controls">
+        <button class="demo-btn primary" id="startB">Mulai latihan</button>
+        <button class="demo-btn" id="resetB">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="harga">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">MODEL FREEMIUM</div>
+      <h2>Mulai gratis, upgrade kalau butuh lebih</h2>
+      <p>Skema B2C sederhana — pengguna baru mulai tanpa biaya, langganan Pro membuka fitur analisis dan panduan gizi lengkap.</p>
+    </div>
+    <div class="pricing">
+      <div class="price-card">
+        <div style="color:var(--ink-dim); font-size:.9rem; font-weight:600;">Gratis</div>
+        <div class="price-tag">Rp 0<span>/bulan</span></div>
+        <ul>
+          <li>Penghitung repetisi real-time</li>
+          <li>Koreksi gerakan dasar (push-up, sit-up)</li>
+          <li>Akses PWA di browser mana pun</li>
+          <li>Riwayat latihan dasar</li>
+        </ul>
+        <a class="btn-ghost" href="#demo">Mulai gratis</a>
+      </div>
+      <div class="price-card pro">
+        <div style="color:var(--red); font-size:.9rem; font-weight:600;">Pro</div>
+        <div class="price-tag">Rp 35.000<span>/bulan</span></div>
+        <ul>
+          <li>Semua fitur Gratis</li>
+          <li>Model ML lanjutan untuk gerakan kompleks</li>
+          <li>Panduan gizi terintegrasi</li>
+          <li>Sinkronisasi penuh dengan Strava</li>
+        </ul>
+        <a class="cta" href="#demo">Coba Pro</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="ctaband">
+    <h2>Latihan berikutnya, biar RepTrack yang menghitung.</h2>
+    <p>Tidak perlu instal apa pun. Buka di browser, izinkan kamera, dan mulai repetisi pertamamu hari ini.</p>
+    <a class="cta" href="#demo">Coba gratis sekarang</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="logo"><span class="dot"></span>RepTrack</div>
+      <p class="credit">Platform web koreksi gerakan & penghitung repetisi berbasis AI.</p>
+    </div>
+    <div class="credit">
+      Proyek Mata Kuliah Kewirausahaan — Kelompok 10<br>
+      Farrel Athaya Firdaus · Frans Ranju Christian Pardede · Khalifa Ikhwanurrayyan
+    </div>
+  </div>
+  <div class="wrap fine">© 2026 RepTrack. Dibuat sebagai studi kasus ide bisnis, Kelompok 10.</div>
+</footer>
+
+<script>
+(function(){
+  function setupDemo(figId, countId, chipId, startId, resetId){
+    var fig = document.getElementById(figId);
+    var countEl = document.getElementById(countId);
+    var chip = document.getElementById(chipId);
+    var startBtn = document.getElementById(startId);
+    var resetBtn = document.getElementById(resetId);
+    var count = 0, running = false, timer = null, down = false;
+    var goodMsgs = ["Bentuk sempurna", "Repetisi tervalidasi", "Pertahankan ritme"];
+    var warnMsgs = ["Turunkan pinggul lebih rendah", "Jaga punggung tetap lurus"];
+
+    function showChip(msg, warn){
+      chip.textContent = msg;
+      chip.classList.toggle('warn', !!warn);
+      chip.classList.add('show');
+      clearTimeout(chip._t);
+      chip._t = setTimeout(function(){ chip.classList.remove('show'); }, 1300);
+    }
+
+    function tick(){
+      down = !down;
+      fig.classList.toggle('down', down);
+      if(!down){
+        count++;
+        countEl.childNodes[0].nodeValue = count;
+        var isWarn = (count % 4 === 0);
+        showChip(isWarn ? warnMsgs[count % warnMsgs.length] : goodMsgs[count % goodMsgs.length], isWarn);
+      }
+    }
+
+    startBtn.addEventListener('click', function(){
+      running = !running;
+      startBtn.textContent = running ? 'Jeda' : 'Mulai latihan';
+      if(running){
+        timer = setInterval(tick, 750);
+      } else {
+        clearInterval(timer);
+      }
+    });
+
+    resetBtn.addEventListener('click', function(){
+      running = false; down = false; count = 0;
+      clearInterval(timer);
+      fig.classList.remove('down');
+      countEl.childNodes[0].nodeValue = 0;
+      chip.classList.remove('show');
+      startBtn.textContent = 'Mulai latihan';
+    });
+  }
+
+  setupDemo('figureA','repNum','chipA','startA','resetA');
+  setupDemo('figureB','repNumB','chipB','startB','resetB');
+})();
+</script>
+
+</body>
+</html>
