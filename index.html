@@ -176,6 +176,32 @@
   .price-card li:before{content:"✓"; color:var(--teal); font-weight:700; flex-shrink:0;}
   .price-card .cta, .price-card .btn-ghost{display:block; text-align:center; margin-top:26px; width:100%;}
 
+  /* dashboard */
+  .dash-top{display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:26px;}
+  @media (max-width:820px){ .dash-top{grid-template-columns:repeat(2,1fr);} }
+  .stat-card{border:1px solid var(--line); border-radius:14px; padding:22px 20px; background:var(--bg);}
+  section.alt .stat-card{background:var(--panel);}
+  .stat-card .stat-label{font-size:.82rem; color:var(--ink-dim);}
+  .stat-card .stat-val{font-family:var(--font-display); font-size:2rem; margin-top:6px;}
+  .stat-card .stat-delta{font-size:.78rem; margin-top:6px; color:var(--teal);}
+  .stat-card .stat-delta.down{color:var(--red);}
+  .dash-grid{display:grid; grid-template-columns:1.3fr .9fr; gap:22px;}
+  @media (max-width:900px){ .dash-grid{grid-template-columns:1fr;} }
+  .dash-panel{border:1px solid var(--line); border-radius:14px; padding:26px; background:var(--bg);}
+  section.alt .dash-panel{background:var(--panel);}
+  .dash-panel h3{font-family:var(--font-display); font-size:1.05rem; font-weight:600; margin-bottom:20px;}
+  .chart{display:flex; align-items:flex-end; gap:12px; height:170px;}
+  .chart .col{flex:1; display:flex; flex-direction:column; align-items:center; gap:8px;}
+  .chart .bar{width:100%; max-width:34px; border-radius:6px 6px 2px 2px; background:linear-gradient(180deg, var(--red), rgba(255,75,43,.35));}
+  .chart .day{font-size:.72rem; color:var(--ink-dim);}
+  .session-row{display:flex; justify-content:space-between; align-items:center; padding:13px 0; border-bottom:1px solid var(--line); font-size:.88rem;}
+  .session-row:last-child{border-bottom:none;}
+  .session-row .s-name{font-weight:600;}
+  .session-row .s-date{color:var(--ink-dim); font-size:.78rem;}
+  .score{font-family:var(--font-display); color:var(--teal);}
+  .sync-row{display:flex; align-items:center; justify-content:space-between; margin-top:18px; padding-top:18px; border-top:1px solid var(--line); font-size:.85rem; color:var(--ink-dim);}
+  .sync-dot{width:8px;height:8px;border-radius:50%; background:var(--teal); display:inline-block; margin-right:8px;}
+
   /* CTA band */
   .ctaband{
     background:var(--panel-2); border-radius:18px; padding:60px 48px; text-align:center; margin:0 28px;
@@ -200,6 +226,7 @@
       <a href="#masalah">Masalah</a>
       <a href="#cara-kerja">Cara kerja</a>
       <a href="#demo">Coba demo</a>
+      <a href="#dashboard">Dashboard</a>
       <a href="#harga">Harga</a>
     </div>
     <a class="cta" href="#demo">Coba gratis</a>
@@ -341,6 +368,78 @@
   </div>
 </section>
 
+<section id="dashboard">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">PANTAU PROGRESMU</div>
+      <h2>Dashboard latihan, semua dalam satu layar</h2>
+      <p>Setiap sesi yang tercatat lewat kamera langsung terangkum di sini — total repetisi, skor bentuk, dan riwayat latihanmu minggu ini.</p>
+    </div>
+
+    <div class="dash-top">
+      <div class="stat-card">
+        <div class="stat-label">Repetisi minggu ini</div>
+        <div class="stat-val tab">486</div>
+        <div class="stat-delta">▲ 12% dari minggu lalu</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Sesi selesai</div>
+        <div class="stat-val tab">9</div>
+        <div class="stat-delta">▲ 2 sesi</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Skor bentuk rata-rata</div>
+        <div class="stat-val tab">91<span style="font-size:1rem; color:var(--ink-dim);">/100</span></div>
+        <div class="stat-delta down">▼ 3 poin</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Streak berturut-turut</div>
+        <div class="stat-val tab">6 hari</div>
+        <div class="stat-delta">▲ rekor baru</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-panel">
+        <h3>Repetisi per hari (7 hari terakhir)</h3>
+        <div class="chart" id="weeklyChart">
+          <div class="col"><div class="bar" style="height:38%"></div><div class="day">Sen</div></div>
+          <div class="col"><div class="bar" style="height:62%"></div><div class="day">Sel</div></div>
+          <div class="col"><div class="bar" style="height:44%"></div><div class="day">Rab</div></div>
+          <div class="col"><div class="bar" style="height:80%"></div><div class="day">Kam</div></div>
+          <div class="col"><div class="bar" style="height:55%"></div><div class="day">Jum</div></div>
+          <div class="col"><div class="bar" style="height:96%"></div><div class="day">Sab</div></div>
+          <div class="col"><div class="bar" style="height:70%"></div><div class="day">Min</div></div>
+        </div>
+        <div class="sync-row">
+          <span><span class="sync-dot"></span>Tersinkron dengan Strava</span>
+          <span>Terakhir sync: 3 menit lalu</span>
+        </div>
+      </div>
+
+      <div class="dash-panel">
+        <h3>Sesi terbaru</h3>
+        <div class="session-row">
+          <div><div class="s-name">Push-up</div><div class="s-date">Hari ini, 07:20</div></div>
+          <div class="score">96</div>
+        </div>
+        <div class="session-row">
+          <div><div class="s-name">Squat</div><div class="s-date">Kemarin, 18:05</div></div>
+          <div class="score">88</div>
+        </div>
+        <div class="session-row">
+          <div><div class="s-name">Sit-up</div><div class="s-date">2 hari lalu, 06:45</div></div>
+          <div class="score">91</div>
+        </div>
+        <div class="session-row">
+          <div><div class="s-name">Push-up</div><div class="s-date">3 hari lalu, 19:30</div></div>
+          <div class="score">84</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="alt" id="harga">
   <div class="wrap">
     <div class="sec-head">
@@ -399,13 +498,14 @@
 
 <script>
 (function(){
-  function setupDemo(figId, countId, chipId, startId, resetId){
-    var fig = document.getElementById(figId);
+  function setupDemo(videoId, placeholderId, countId, chipId, startId, resetId){
+    var video = document.getElementById(videoId);
+    var placeholder = document.getElementById(placeholderId);
     var countEl = document.getElementById(countId);
     var chip = document.getElementById(chipId);
     var startBtn = document.getElementById(startId);
     var resetBtn = document.getElementById(resetId);
-    var count = 0, running = false, timer = null, down = false;
+    var count = 0, running = false, timer = null, stream = null;
     var goodMsgs = ["Bentuk sempurna", "Repetisi tervalidasi", "Pertahankan ritme"];
     var warnMsgs = ["Turunkan pinggul lebih rendah", "Jaga punggung tetap lurus"];
 
@@ -418,38 +518,92 @@
     }
 
     function tick(){
-      down = !down;
-      fig.classList.toggle('down', down);
-      if(!down){
-        count++;
-        countEl.childNodes[0].nodeValue = count;
-        var isWarn = (count % 4 === 0);
-        showChip(isWarn ? warnMsgs[count % warnMsgs.length] : goodMsgs[count % goodMsgs.length], isWarn);
+      count++;
+      countEl.childNodes[0].nodeValue = count;
+      var isWarn = (count % 4 === 0);
+      showChip(isWarn ? warnMsgs[count % warnMsgs.length] : goodMsgs[count % goodMsgs.length], isWarn);
+    }
+
+    function stopCamera(){
+      if(stream){
+        stream.getTracks().forEach(function(t){ t.stop(); });
+        stream = null;
+      }
+      video.classList.remove('show');
+      placeholder.classList.remove('hide');
+      placeholder.classList.remove('error');
+      placeholder.querySelector('p').textContent = 'Klik "Mulai latihan" dan izinkan akses kamera';
+    }
+
+    async function startCamera(){
+      if(!window.isSecureContext){
+        placeholder.classList.add('error');
+        placeholder.querySelector('p').textContent = 'Halaman harus diakses lewat HTTPS agar kamera bisa dipakai.';
+        return false;
+      }
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        placeholder.classList.add('error');
+        placeholder.querySelector('p').textContent = 'Browser ini tidak mendukung akses kamera.';
+        return false;
+      }
+      try{
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        video.srcObject = stream;
+        try{ await video.play(); }catch(playErr){ /* autoplay quirks, ignore */ }
+        video.classList.add('show');
+        placeholder.classList.remove('error');
+        placeholder.classList.add('hide');
+        return true;
+      }catch(err){
+        var msg = 'Akses kamera ditolak atau tidak tersedia di perangkat ini.';
+        if(err && err.name === 'NotAllowedError') msg = 'Izin kamera ditolak. Buka pengaturan situs di browser (ikon gembok di address bar), izinkan kamera, lalu klik "Mulai latihan" lagi.';
+        else if(err && err.name === 'NotFoundError') msg = 'Tidak ada kamera yang terdeteksi di perangkat ini.';
+        else if(err && err.name === 'NotReadableError') msg = 'Kamera sedang dipakai aplikasi lain. Tutup aplikasi tersebut lalu coba lagi.';
+        else if(err && err.name === 'SecurityError') msg = 'Akses kamera diblokir oleh browser di halaman ini.';
+        placeholder.classList.add('error');
+        placeholder.querySelector('p').textContent = msg;
+        return false;
       }
     }
 
-    startBtn.addEventListener('click', function(){
-      running = !running;
-      startBtn.textContent = running ? 'Jeda' : 'Mulai latihan';
-      if(running){
-        timer = setInterval(tick, 750);
+    startBtn.addEventListener('click', async function(){
+      if(!running){
+        if(!stream){
+          startBtn.disabled = true;
+          var ok = await startCamera();
+          startBtn.disabled = false;
+          if(!ok) return;
+        }
+        running = true;
+        startBtn.textContent = 'Jeda';
+        timer = setInterval(tick, 1400);
       } else {
+        running = false;
+        startBtn.textContent = 'Lanjutkan';
         clearInterval(timer);
       }
     });
 
     resetBtn.addEventListener('click', function(){
-      running = false; down = false; count = 0;
+      running = false; count = 0;
       clearInterval(timer);
-      fig.classList.remove('down');
       countEl.childNodes[0].nodeValue = 0;
       chip.classList.remove('show');
       startBtn.textContent = 'Mulai latihan';
+      stopCamera();
+    });
+
+    document.addEventListener('visibilitychange', function(){
+      if(document.hidden && stream){
+        running = false;
+        clearInterval(timer);
+        startBtn.textContent = 'Lanjutkan';
+      }
     });
   }
 
-  setupDemo('figureA','repNum','chipA','startA','resetA');
-  setupDemo('figureB','repNumB','chipB','startB','resetB');
+  setupDemo('camA','placeholderA','repNum','chipA','startA','resetA');
+  setupDemo('camB','placeholderB','repNumB','chipB','startB','resetB');
 })();
 </script>
 
